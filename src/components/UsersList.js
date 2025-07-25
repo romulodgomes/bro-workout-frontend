@@ -41,7 +41,7 @@ const UsersList = () => {
       setUsers(response.data);
       setError('');
     } catch (err) {
-      setError('Failed to fetch users');
+      setError('Falha ao carregar usuários');
       console.error('Error fetching users:', err);
     } finally {
       setLoading(false);
@@ -55,7 +55,7 @@ const UsersList = () => {
       setNewUser({ nome: '', email: '', password: '' });
       fetchUsers();
     } catch (err) {
-      setError('Failed to create user');
+      setError('Falha ao criar usuário');
       console.error('Error creating user:', err);
     }
   };
@@ -81,7 +81,7 @@ const UsersList = () => {
     <Container maxWidth="lg" sx={{ mt: 4 }}>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
         <Typography variant="h4" component="h1" sx={{ color: '#1a237e' }}>
-          Users
+          Usuários
         </Typography>
         <Button
           variant="contained"
@@ -89,7 +89,7 @@ const UsersList = () => {
           onClick={() => setOpenDialog(true)}
           sx={{ backgroundColor: '#1a237e' }}
         >
-          Add User
+          Adicionar Usuário
         </Button>
       </Box>
 
@@ -115,7 +115,7 @@ const UsersList = () => {
                 </Typography>
                 <Box mt={2}>
                   <Typography variant="body2" color="text.secondary">
-                    Workouts: {user.treinos?.length || 0}
+                    Treinos: {user.treinos?.length || 0}
                   </Typography>
                   {user.treinos && user.treinos.length > 0 && (
                     <Box mt={1}>
@@ -129,7 +129,7 @@ const UsersList = () => {
                       ))}
                       {user.treinos.length > 3 && (
                         <Chip
-                          label={`+${user.treinos.length - 3} more`}
+                          label={`+${user.treinos.length - 3} mais`}
                           size="small"
                           variant="outlined"
                         />
@@ -142,7 +142,7 @@ const UsersList = () => {
                     onClick={() => handleAddWorkout(user._id)}
                     sx={{ mt: 1 }}
                   >
-                    Add Workout
+                    Adicionar Treino
                   </Button>
                 </Box>
               </CardContent>
@@ -152,12 +152,12 @@ const UsersList = () => {
       </Grid>
 
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Add New User</DialogTitle>
+        <DialogTitle>Adicionar Novo Usuário</DialogTitle>
         <DialogContent>
           <TextField
             autoFocus
             margin="dense"
-            label="Name"
+            label="Nome"
             fullWidth
             variant="outlined"
             value={newUser.nome}
@@ -176,7 +176,7 @@ const UsersList = () => {
           />
           <TextField
             margin="dense"
-            label="Password"
+            label="Senha"
             type="password"
             fullWidth
             variant="outlined"
@@ -185,9 +185,9 @@ const UsersList = () => {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
+          <Button onClick={() => setOpenDialog(false)}>Cancelar</Button>
           <Button onClick={handleCreateUser} variant="contained" sx={{ backgroundColor: '#1a237e' }}>
-            Create
+            Criar
           </Button>
         </DialogActions>
       </Dialog>

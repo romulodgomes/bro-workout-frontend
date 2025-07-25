@@ -19,10 +19,10 @@ const Home = () => {
       <Box textAlign="center" mb={6}>
         <FitnessCenterIcon sx={{ fontSize: 80, color: '#1a237e', mb: 2 }} />
         <Typography variant="h2" component="h1" gutterBottom sx={{ color: '#1a237e' }}>
-          Welcome to Bro Workout
+          Bem-vindo ao Bro Workout
         </Typography>
         <Typography variant="h5" color="text.secondary" paragraph>
-          Your ultimate fitness companion for tracking workouts and managing exercises
+          Seu companheiro fitness definitivo para acompanhar treinos e gerenciar exercícios
         </Typography>
       </Box>
 
@@ -32,10 +32,10 @@ const Home = () => {
             <CardContent>
               <PeopleIcon sx={{ fontSize: 60, color: '#1a237e', mb: 2 }} />
               <Typography variant="h5" component="h2" gutterBottom>
-                Manage Users
+                Gerenciar Usuários
               </Typography>
               <Typography variant="body1" color="text.secondary" paragraph>
-                Create and manage user profiles, track their progress, and assign personalized workouts.
+                Crie e gerencie perfis de usuários, acompanhe seu progresso e atribua treinos personalizados.
               </Typography>
               <Button 
                 variant="contained" 
@@ -43,7 +43,7 @@ const Home = () => {
                 to="/users"
                 sx={{ backgroundColor: '#1a237e' }}
               >
-                View Users
+                Ver Usuários
               </Button>
             </CardContent>
           </Card>
@@ -54,10 +54,10 @@ const Home = () => {
             <CardContent>
               <DirectionsRunIcon sx={{ fontSize: 60, color: '#1a237e', mb: 2 }} />
               <Typography variant="h5" component="h2" gutterBottom>
-                Exercise Library
+                Biblioteca de Exercícios
               </Typography>
               <Typography variant="body1" color="text.secondary" paragraph>
-                Browse and manage exercises with videos and images to help users perform correctly.
+                Navegue e gerencie exercícios com vídeos e imagens para ajudar os usuários a executar corretamente.
               </Typography>
               <Button 
                 variant="contained" 
@@ -65,7 +65,7 @@ const Home = () => {
                 to="/exercises"
                 sx={{ backgroundColor: '#1a237e' }}
               >
-                View Exercises
+                Ver Exercícios
               </Button>
             </CardContent>
           </Card>
@@ -76,10 +76,10 @@ const Home = () => {
             <CardContent>
               <FitnessCenterIcon sx={{ fontSize: 60, color: '#1a237e', mb: 2 }} />
               <Typography variant="h5" component="h2" gutterBottom>
-                Workout Tracking
+                Acompanhamento de Treinos
               </Typography>
               <Typography variant="body1" color="text.secondary" paragraph>
-                Create custom workouts with sets, reps, and weights to track user progress over time.
+                Crie treinos personalizados com séries, repetições e pesos para acompanhar o progresso dos usuários ao longo do tempo.
               </Typography>
               <Button 
                 variant="contained" 
@@ -87,7 +87,7 @@ const Home = () => {
                 to="/users"
                 sx={{ backgroundColor: '#1a237e' }}
               >
-                Start Tracking
+                Começar Acompanhamento
               </Button>
             </CardContent>
           </Card>

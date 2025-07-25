@@ -17,21 +17,21 @@ const Header = () => {
             component={RouterLink} 
             to="/"
           >
-            Home
+            Início
           </Button>
           <Button 
             color="inherit" 
             component={RouterLink} 
             to="/users"
           >
-            Users
+            Usuários
           </Button>
           <Button 
             color="inherit" 
             component={RouterLink} 
             to="/exercises"
           >
-            Exercises
+            Exercícios
           </Button>
         </Box>
       </Toolbar>

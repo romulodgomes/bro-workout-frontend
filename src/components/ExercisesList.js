@@ -38,7 +38,7 @@ const ExercisesList = () => {
       setExercises(response.data);
       setError('');
     } catch (err) {
-      setError('Failed to fetch exercises');
+      setError('Falha ao carregar exercícios');
       console.error('Error fetching exercises:', err);
     } finally {
       setLoading(false);
@@ -52,7 +52,7 @@ const ExercisesList = () => {
       setNewExercise({ nome: '', video: '', imagem: '' });
       fetchExercises();
     } catch (err) {
-      setError('Failed to create exercise');
+      setError('Falha ao criar exercício');
       console.error('Error creating exercise:', err);
     }
   };
@@ -69,7 +69,7 @@ const ExercisesList = () => {
     <Container maxWidth="lg" sx={{ mt: 4 }}>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
         <Typography variant="h4" component="h1" sx={{ color: '#1a237e' }}>
-          Exercises
+          Exercícios
         </Typography>
         <Button
           variant="contained"
@@ -77,7 +77,7 @@ const ExercisesList = () => {
           onClick={() => setOpenDialog(true)}
           sx={{ backgroundColor: '#1a237e' }}
         >
-          Add Exercise
+          Adicionar Exercício
         </Button>
       </Box>
 
@@ -116,7 +116,7 @@ const ExercisesList = () => {
                     rel="noopener noreferrer"
                     sx={{ mt: 1 }}
                   >
-                    Watch Video
+                    Assistir Vídeo
                   </Button>
                 )}
               </CardContent>
@@ -126,12 +126,12 @@ const ExercisesList = () => {
       </Grid>
 
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Add New Exercise</DialogTitle>
+        <DialogTitle>Adicionar Novo Exercício</DialogTitle>
         <DialogContent>
           <TextField
             autoFocus
             margin="dense"
-            label="Exercise Name"
+            label="Nome do Exercício"
             fullWidth
             variant="outlined"
             value={newExercise.nome}
@@ -140,7 +140,7 @@ const ExercisesList = () => {
           />
           <TextField
             margin="dense"
-            label="Video URL (optional)"
+            label="URL do Vídeo (opcional)"
             fullWidth
             variant="outlined"
             value={newExercise.video}
@@ -149,7 +149,7 @@ const ExercisesList = () => {
           />
           <TextField
             margin="dense"
-            label="Image URL (optional)"
+            label="URL da Imagem (opcional)"
             fullWidth
             variant="outlined"
             value={newExercise.imagem}
@@ -157,9 +157,9 @@ const ExercisesList = () => {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
+          <Button onClick={() => setOpenDialog(false)}>Cancelar</Button>
           <Button onClick={handleCreateExercise} variant="contained" sx={{ backgroundColor: '#1a237e' }}>
-            Create
+            Criar
           </Button>
         </DialogActions>
       </Dialog>

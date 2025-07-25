@@ -59,13 +59,13 @@ const WorkoutForm = ({ open, onClose, userId, onWorkoutAdded }) => {
 
   const handleSubmit = async () => {
     if (!workoutName.trim()) {
-      setError('Workout name is required');
+      setError('Nome do treino é obrigatório');
       return;
     }
 
     const validSeries = series.filter(s => s.exercicio && s.repeticoes && s.execucoes);
     if (validSeries.length === 0) {
-      setError('At least one exercise series is required');
+      setError('Pelo menos uma série de exercício é obrigatória');
       return;
     }
 
@@ -89,7 +89,7 @@ const WorkoutForm = ({ open, onClose, userId, onWorkoutAdded }) => {
       setWorkoutName('');
       setSeries([{ exercicio: '', repeticoes: '', execucoes: '', carga: '' }]);
     } catch (err) {
-      setError('Failed to add workout');
+      setError('Falha ao adicionar treino');
       console.error('Error adding workout:', err);
     } finally {
       setLoading(false);
@@ -98,7 +98,7 @@ const WorkoutForm = ({ open, onClose, userId, onWorkoutAdded }) => {
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-      <DialogTitle>Add New Workout</DialogTitle>
+      <DialogTitle>Adicionar Novo Treino</DialogTitle>
       <DialogContent>
         {error && (
           <Alert severity="error" sx={{ mb: 2 }}>
@@ -109,7 +109,7 @@ const WorkoutForm = ({ open, onClose, userId, onWorkoutAdded }) => {
         <TextField
           autoFocus
           margin="dense"
-          label="Workout Name"
+          label="Nome do Treino"
           fullWidth
           variant="outlined"
           value={workoutName}
@@ -118,13 +118,13 @@ const WorkoutForm = ({ open, onClose, userId, onWorkoutAdded }) => {
         />
 
         <Typography variant="h6" gutterBottom>
-          Exercise Series
+          Séries de Exercícios
         </Typography>
 
         {series.map((serie, index) => (
           <Box key={index} sx={{ mb: 2, p: 2, border: '1px solid #e0e0e0', borderRadius: 1 }}>
             <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-              <Typography variant="subtitle1">Series {index + 1}</Typography>
+              <Typography variant="subtitle1">Série {index + 1}</Typography>
               {series.length > 1 && (
                 <IconButton
                   size="small"
@@ -139,10 +139,10 @@ const WorkoutForm = ({ open, onClose, userId, onWorkoutAdded }) => {
             <Grid container spacing={2}>
               <Grid item xs={12} md={6}>
                 <FormControl fullWidth>
-                  <InputLabel>Exercise</InputLabel>
+                  <InputLabel>Exercício</InputLabel>
                   <Select
                     value={serie.exercicio}
-                    label="Exercise"
+                    label="Exercício"
                     onChange={(e) => handleSeriesChange(index, 'exercicio', e.target.value)}
                   >
                     {exercises.map((exercise) => (
@@ -155,7 +155,7 @@ const WorkoutForm = ({ open, onClose, userId, onWorkoutAdded }) => {
               </Grid>
               <Grid item xs={12} md={2}>
                 <TextField
-                  label="Reps"
+                  label="Repetições"
                   type="number"
                   fullWidth
                   value={serie.repeticoes}
@@ -164,7 +164,7 @@ const WorkoutForm = ({ open, onClose, userId, onWorkoutAdded }) => {
               </Grid>
               <Grid item xs={12} md={2}>
                 <TextField
-                  label="Sets"
+                  label="Séries"
                   type="number"
                   fullWidth
                   value={serie.execucoes}
@@ -173,7 +173,7 @@ const WorkoutForm = ({ open, onClose, userId, onWorkoutAdded }) => {
               </Grid>
               <Grid item xs={12} md={2}>
                 <TextField
-                  label="Weight (kg)"
+                  label="Peso (kg)"
                   type="number"
                   fullWidth
                   value={serie.carga}
@@ -190,18 +190,18 @@ const WorkoutForm = ({ open, onClose, userId, onWorkoutAdded }) => {
           variant="outlined"
           sx={{ mt: 1 }}
         >
-          Add Series
+          Adicionar Série
         </Button>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={onClose}>Cancelar</Button>
         <Button 
           onClick={handleSubmit} 
           variant="contained" 
           disabled={loading}
           sx={{ backgroundColor: '#1a237e' }}
         >
-          {loading ? 'Adding...' : 'Add Workout'}
+          {loading ? 'Adicionando...' : 'Adicionar Treino'}
         </Button>
       </DialogActions>
     </Dialog>
