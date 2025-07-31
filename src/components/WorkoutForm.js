@@ -20,7 +20,7 @@ import { usersAPI, exercisesAPI } from '../services/api';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 
-const WorkoutForm = ({ open, onClose, userId, onWorkoutAdded }) => {
+const WorkoutForm = ({ open, onClose, userId, onWorkoutAdded, treinoId = null, initialData = null, isEdit = false }) => {
   const [exercises, setExercises] = useState([]);
   const [workoutName, setWorkoutName] = useState('');
   const [series, setSeries] = useState([{ exercicio: '', repeticoes: '', execucoes: '', carga: '' }]);
@@ -30,8 +30,24 @@ const WorkoutForm = ({ open, onClose, userId, onWorkoutAdded }) => {
   useEffect(() => {
     if (open) {
       fetchExercises();
+      if (isEdit && initialData) {
+        setWorkoutName(initialData.nome || '');
+        setSeries(
+          initialData.series && initialData.series.length > 0
+            ? initialData.series.map(s => ({
+                exercicio: s.exercicio?._id || s.exercicio || '',
+                repeticoes: s.repeticoes || '',
+                execucoes: s.execucoes || '',
+                carga: s.carga || ''
+              }))
+            : [{ exercicio: '', repeticoes: '', execucoes: '', carga: '' }]
+        );
+      } else {
+        setWorkoutName('');
+        setSeries([{ exercicio: '', repeticoes: '', execucoes: '', carga: '' }]);
+      }
     }
-  }, [open]);
+  }, [open, isEdit, initialData]);
 
   const fetchExercises = async () => {
     try {
@@ -72,7 +88,6 @@ const WorkoutForm = ({ open, onClose, userId, onWorkoutAdded }) => {
     try {
       setLoading(true);
       setError('');
-      
       const workoutData = {
         nome: workoutName,
         series: validSeries.map(s => ({
@@ -82,15 +97,18 @@ const WorkoutForm = ({ open, onClose, userId, onWorkoutAdded }) => {
           carga: s.carga ? parseInt(s.carga) : 0
         }))
       };
-
-      await usersAPI.addWorkout(userId, workoutData);
+      if (isEdit && treinoId) {
+        await usersAPI.editWorkout(userId, treinoId, workoutData);
+      } else {
+        await usersAPI.addWorkout(userId, workoutData);
+      }
       onWorkoutAdded();
       onClose();
       setWorkoutName('');
       setSeries([{ exercicio: '', repeticoes: '', execucoes: '', carga: '' }]);
     } catch (err) {
-      setError('Falha ao adicionar treino');
-      console.error('Error adding workout:', err);
+      setError(isEdit ? 'Falha ao editar treino' : 'Falha ao adicionar treino');
+      console.error('Error adding/editing workout:', err);
     } finally {
       setLoading(false);
     }
@@ -98,7 +116,7 @@ const WorkoutForm = ({ open, onClose, userId, onWorkoutAdded }) => {
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-      <DialogTitle>Adicionar Novo Treino</DialogTitle>
+      <DialogTitle>{isEdit ? 'Editar Treino' : 'Adicionar Novo Treino'}</DialogTitle>
       <DialogContent>
         {error && (
           <Alert severity="error" sx={{ mb: 2 }}>
@@ -201,7 +219,7 @@ const WorkoutForm = ({ open, onClose, userId, onWorkoutAdded }) => {
           disabled={loading}
           sx={{ backgroundColor: '#1a237e' }}
         >
-          {loading ? 'Adicionando...' : 'Adicionar Treino'}
+          {loading ? (isEdit ? 'Salvando...' : 'Adicionando...') : (isEdit ? 'Salvar Alterações' : 'Adicionar Treino')}
         </Button>
       </DialogActions>
     </Dialog>

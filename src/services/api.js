@@ -14,6 +14,7 @@ export const usersAPI = {
   getAll: () => api.get('/users'),
   create: (userData) => api.post('/users', userData),
   addWorkout: (userId, workoutData) => api.patch(`/users/${userId}/treinos`, workoutData),
+  editWorkout: (userId, treinoId, workoutData) => api.patch(`/users/${userId}/treinos/${treinoId}`, workoutData),
 };
 
 // Exercises API

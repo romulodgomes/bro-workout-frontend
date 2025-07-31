@@ -3,9 +3,6 @@ import {
   Container,
   Typography,
   Box,
-  Card,
-  CardContent,
-  Grid,
   Button,
   Dialog,
   DialogTitle,
@@ -14,11 +11,18 @@ import {
   TextField,
   Alert,
   CircularProgress,
-  CardMedia
+  List,
+  ListItem,
+  ListItemText,
+  ListItemAvatar,
+  Avatar,
+  Paper,
+  Divider
 } from '@mui/material';
 import { exercisesAPI } from '../services/api';
 import AddIcon from '@mui/icons-material/Add';
 import DirectionsRunIcon from '@mui/icons-material/DirectionsRun';
+import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 
 const ExercisesList = () => {
   const [exercises, setExercises] = useState([]);
@@ -87,43 +91,62 @@ const ExercisesList = () => {
         </Alert>
       )}
 
-      <Grid container spacing={3}>
-        {exercises.map((exercise) => (
-          <Grid item xs={12} md={6} lg={4} key={exercise._id}>
-            <Card sx={{ height: '100%' }}>
-              {exercise.imagem && (
-                <CardMedia
-                  component="img"
-                  height="200"
-                  image={exercise.imagem}
-                  alt={exercise.nome}
-                  sx={{ objectFit: 'cover' }}
+      <Paper elevation={2}>
+        <List>
+          {exercises.map((exercise, index) => (
+            <React.Fragment key={exercise._id}>
+              <ListItem alignItems="flex-start">
+                <ListItemAvatar>
+                  <Avatar sx={{ bgcolor: '#1a237e' }}>
+                    <DirectionsRunIcon />
+                  </Avatar>
+                </ListItemAvatar>
+                <ListItemText
+                  primary={exercise.nome}
+                  secondary={
+                    <Box>
+                      {exercise.video && (
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          startIcon={<PlayCircleOutlineIcon />}
+                          href={exercise.video}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          sx={{ mt: 1, mr: 1 }}
+                        >
+                          Assistir Vídeo
+                        </Button>
+                      )}
+                      {exercise.imagem && (
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          href={exercise.imagem}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          sx={{ mt: 1 }}
+                        >
+                          Ver Imagem
+                        </Button>
+                      )}
+                    </Box>
+                  }
                 />
-              )}
-              <CardContent>
-                <Box display="flex" alignItems="center" mb={2}>
-                  <DirectionsRunIcon sx={{ mr: 1, color: '#1a237e' }} />
-                  <Typography variant="h6" component="h2">
-                    {exercise.nome}
-                  </Typography>
-                </Box>
-                {exercise.video && (
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    href={exercise.video}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    sx={{ mt: 1 }}
-                  >
-                    Assistir Vídeo
-                  </Button>
-                )}
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
+              </ListItem>
+              {index < exercises.length - 1 && <Divider />}
+            </React.Fragment>
+          ))}
+          {exercises.length === 0 && (
+            <ListItem>
+              <ListItemText
+                primary="Nenhum exercício cadastrado"
+                secondary="Clique em 'Adicionar Exercício' para começar"
+              />
+            </ListItem>
+          )}
+        </List>
+      </Paper>
 
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="sm" fullWidth>
         <DialogTitle>Adicionar Novo Exercício</DialogTitle>

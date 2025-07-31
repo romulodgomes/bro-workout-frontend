@@ -14,12 +14,14 @@ import {
   TextField,
   Alert,
   CircularProgress,
-  Chip
+  Chip,
+  IconButton
 } from '@mui/material';
 import { usersAPI } from '../services/api';
 import AddIcon from '@mui/icons-material/Add';
 import PersonIcon from '@mui/icons-material/Person';
 import WorkoutForm from './WorkoutForm';
+import EditIcon from '@mui/icons-material/Edit';
 
 const UsersList = () => {
   const [users, setUsers] = useState([]);
@@ -29,6 +31,7 @@ const UsersList = () => {
   const [newUser, setNewUser] = useState({ nome: '', email: '', password: '' });
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [workoutFormOpen, setWorkoutFormOpen] = useState(false);
+  const [editWorkoutDialog, setEditWorkoutDialog] = useState({ open: false, userId: null, treinoId: null, initialData: null });
 
   useEffect(() => {
     fetchUsers();
@@ -67,6 +70,10 @@ const UsersList = () => {
 
   const handleWorkoutAdded = () => {
     fetchUsers();
+  };
+
+  const handleEditWorkout = (userId, treino) => {
+    setEditWorkoutDialog({ open: true, userId, treinoId: treino._id, initialData: treino });
   };
 
   if (loading) {
@@ -120,12 +127,16 @@ const UsersList = () => {
                   {user.treinos && user.treinos.length > 0 && (
                     <Box mt={1}>
                       {user.treinos.slice(0, 3).map((treino, index) => (
-                        <Chip
-                          key={index}
-                          label={treino.nome}
-                          size="small"
-                          sx={{ mr: 0.5, mb: 0.5 }}
-                        />
+                        <span key={index} style={{ display: 'inline-flex', alignItems: 'center', marginRight: 4, marginBottom: 4 }}>
+                          <Chip
+                            label={treino.nome}
+                            size="small"
+                            sx={{ mr: 0.5, mb: 0.5 }}
+                          />
+                          <IconButton size="small" onClick={() => handleEditWorkout(user._id, treino)} aria-label="Editar Treino">
+                            <EditIcon fontSize="small" />
+                          </IconButton>
+                        </span>
                       ))}
                       {user.treinos.length > 3 && (
                         <Chip
@@ -197,6 +208,18 @@ const UsersList = () => {
         onClose={() => setWorkoutFormOpen(false)}
         userId={selectedUserId}
         onWorkoutAdded={handleWorkoutAdded}
+      />
+      <WorkoutForm
+        open={editWorkoutDialog.open}
+        onClose={() => setEditWorkoutDialog({ open: false, userId: null, treinoId: null, initialData: null })}
+        userId={editWorkoutDialog.userId}
+        treinoId={editWorkoutDialog.treinoId}
+        initialData={editWorkoutDialog.initialData}
+        isEdit={true}
+        onWorkoutAdded={() => {
+          setEditWorkoutDialog({ open: false, userId: null, treinoId: null, initialData: null });
+          fetchUsers();
+        }}
       />
     </Container>
   );
