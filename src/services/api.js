@@ -1,6 +1,8 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://157.245.167.2:4000';
+const API_BASE_URL = process.env.NODE_ENV === 'production' 
+  ? '/api/proxy' 
+  : 'http://157.245.167.2:4000';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
