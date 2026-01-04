@@ -33,6 +33,13 @@ const Header = () => {
           >
             Exercícios
           </Button>
+          <Button 
+            color="inherit" 
+            component={RouterLink} 
+            to="/active-workout"
+          >
+            Treino Ativo
+          </Button>
         </Box>
       </Toolbar>
     </AppBar>

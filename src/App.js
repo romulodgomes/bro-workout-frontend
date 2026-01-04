@@ -6,6 +6,7 @@ import Header from './components/Header';
 import Home from './components/Home';
 import UsersList from './components/UsersList';
 import ExercisesList from './components/ExercisesList';
+import ActiveWorkoutView from './components/ActiveWorkoutView';
 
 const theme = createTheme({
   palette: {
@@ -32,6 +33,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/users" element={<UsersList />} />
             <Route path="/exercises" element={<ExercisesList />} />
+            <Route path="/active-workout" element={<ActiveWorkoutView />} />
           </Routes>
         </div>
       </Router>

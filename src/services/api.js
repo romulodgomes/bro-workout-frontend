@@ -13,6 +13,7 @@ const api = axios.create({
 export const usersAPI = {
   getAll: () => api.get('/users'),
   create: (userData) => api.post('/users', userData),
+  getWorkouts: (userId) => api.get(`/users/${userId}/treinos`),
   addWorkout: (userId, workoutData) => api.patch(`/users/${userId}/treinos`, workoutData),
   editWorkout: (userId, treinoId, workoutData) => api.patch(`/users/${userId}/treinos/${treinoId}`, workoutData),
 };
