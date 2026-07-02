@@ -1,11 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   Container,
   Typography,
   Box,
-  Card,
-  CardContent,
-  Grid,
   Button,
   Dialog,
   DialogTitle,
@@ -13,17 +10,90 @@ import {
   DialogActions,
   TextField,
   Alert,
-  CircularProgress,
   Chip,
-  IconButton
+  IconButton,
+  useTheme,
+  useMediaQuery
 } from '@mui/material';
+import { DataGrid } from '@mui/x-data-grid';
 import { usersAPI } from '../services/api';
 import AddIcon from '@mui/icons-material/Add';
-import PersonIcon from '@mui/icons-material/Person';
 import WorkoutForm from './WorkoutForm';
 import EditIcon from '@mui/icons-material/Edit';
 
+const TreinosCell = ({ treinos, userId, isCompact, isMobile, isTightCompact, onEdit }) => {
+  if (treinos.length === 0) {
+    return (
+      <Typography variant="body2" color="text.secondary">
+        Nenhum treino
+      </Typography>
+    );
+  }
+
+  const maxVisible = isMobile ? 2 : isTightCompact ? 1 : isCompact ? 2 : 3;
+  const chipMaxWidth = isTightCompact ? 120 : isCompact ? 140 : 180;
+
+  return (
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        alignItems: 'center',
+        gap: 0.5,
+        py: 0.5,
+        width: '100%',
+      }}
+    >
+      {treinos.slice(0, maxVisible).map((treino, index) => (
+        <Box
+          key={treino._id || index}
+          sx={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            minWidth: 0,
+            maxWidth: '100%',
+          }}
+        >
+          <Chip
+            label={treino.nome}
+            size="small"
+            sx={{
+              minWidth: 0,
+              maxWidth: chipMaxWidth,
+              '& .MuiChip-label': {
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              },
+            }}
+          />
+          <IconButton
+            size="small"
+            onClick={() => onEdit(userId, treino)}
+            aria-label="Editar Treino"
+            sx={{ flexShrink: 0, ml: 0.25 }}
+          >
+            <EditIcon fontSize="small" />
+          </IconButton>
+        </Box>
+      ))}
+      {treinos.length > maxVisible && (
+        <Chip
+          label={`+${treinos.length - maxVisible} mais`}
+          size="small"
+          variant="outlined"
+        />
+      )}
+    </Box>
+  );
+};
+
 const UsersList = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isCompact = useMediaQuery(theme.breakpoints.down('lg'));
+  const isTightCompact = useMediaQuery(theme.breakpoints.between('md', 'lg'));
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -72,21 +142,180 @@ const UsersList = () => {
     fetchUsers();
   };
 
-  const handleEditWorkout = (userId, treino) => {
+  const handleEditWorkout = useCallback((userId, treino) => {
     setEditWorkoutDialog({ open: true, userId, treinoId: treino._id, initialData: treino });
-  };
+  }, []);
 
-  if (loading) {
-    return (
-      <Container sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-        <CircularProgress />
-      </Container>
-    );
-  }
+  const rows = useMemo(
+    () => users.map((user) => ({ ...user, id: user._id })),
+    [users]
+  );
+
+  const columns = useMemo(() => {
+    if (isMobile) {
+      return [
+        {
+          field: 'usuario',
+          headerName: 'Usuário',
+          flex: 1,
+          minWidth: 0,
+          sortable: true,
+          valueGetter: (value, row) => row.nome,
+          renderCell: (params) => (
+            <Box sx={{ py: 0.5, minWidth: 0, width: '100%' }}>
+              <Typography variant="body2" fontWeight={500} sx={{ wordBreak: 'break-word' }}>
+                {params.row.nome}
+              </Typography>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ display: 'block', wordBreak: 'break-all', mb: 0.75 }}
+              >
+                {params.row.email}
+              </Typography>
+              <TreinosCell
+                treinos={params.row.treinos || []}
+                userId={params.row.id}
+                isCompact
+                isMobile
+                isTightCompact={false}
+                onEdit={handleEditWorkout}
+              />
+            </Box>
+          ),
+        },
+        {
+          field: 'acoes',
+          headerName: 'Ações',
+          width: 56,
+          sortable: false,
+          filterable: false,
+          align: 'center',
+          headerAlign: 'center',
+          renderCell: (params) => (
+            <IconButton
+              size="small"
+              color="primary"
+              onClick={() => handleAddWorkout(params.row.id)}
+              aria-label="Adicionar Treino"
+            >
+              <AddIcon fontSize="small" />
+            </IconButton>
+          ),
+        },
+      ];
+    }
+
+    return [
+      {
+        field: 'nome',
+        headerName: 'Nome',
+        flex: 1,
+        minWidth: isTightCompact ? 130 : 140,
+        renderCell: isCompact
+          ? (params) => (
+              <Box sx={{ py: 0.5, minWidth: 0 }}>
+                <Typography variant="body2" fontWeight={500} sx={{ wordBreak: 'break-word' }}>
+                  {params.row.nome}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ display: 'block', wordBreak: 'break-all' }}
+                >
+                  {params.row.email}
+                </Typography>
+              </Box>
+            )
+          : undefined,
+      },
+      {
+        field: 'email',
+        headerName: 'Email',
+        flex: 1,
+        minWidth: 180,
+      },
+      {
+        field: 'treinos',
+        headerName: 'Treinos',
+        flex: 2,
+        minWidth: isTightCompact ? 150 : 180,
+        sortable: false,
+        filterable: false,
+        renderCell: (params) => (
+          <TreinosCell
+            treinos={params.row.treinos || []}
+            userId={params.row.id}
+            isCompact={isCompact}
+            isMobile={false}
+            isTightCompact={isTightCompact}
+            onEdit={handleEditWorkout}
+          />
+        ),
+      },
+      {
+        field: 'acoes',
+        headerName: 'Ações',
+        width: isTightCompact ? 110 : isCompact ? 130 : 160,
+        sortable: false,
+        filterable: false,
+        renderCell: (params) => (
+          <Button
+            variant="outlined"
+            size="small"
+            onClick={() => handleAddWorkout(params.row.id)}
+            sx={{
+              whiteSpace: 'nowrap',
+              fontSize: isCompact ? '0.75rem' : undefined,
+              px: isTightCompact ? 1 : undefined,
+            }}
+          >
+            {isCompact ? 'Adicionar' : 'Adicionar Treino'}
+          </Button>
+        ),
+      },
+    ];
+  }, [isMobile, isCompact, isTightCompact, handleEditWorkout]);
+
+  const columnVisibilityModel = useMemo(
+    () => ({
+      email: !isCompact,
+      nome: !isMobile,
+      treinos: !isMobile,
+    }),
+    [isCompact, isMobile]
+  );
+
+  const getRowHeight = useCallback(
+    (params) => {
+      if (!isCompact) return 52;
+
+      const treinos = params.model.treinos?.length ?? 0;
+      const maxVisible = isMobile ? 2 : isTightCompact ? 1 : 2;
+      const visibleTreinos = Math.min(treinos, maxVisible);
+      const extraChip = treinos > maxVisible ? 1 : 0;
+      const treinosRows = treinos === 0 ? 0 : Math.ceil((visibleTreinos + extraChip) / 2);
+      const treinosHeight = treinos === 0 ? 20 : treinosRows * 36;
+
+      if (isMobile) {
+        return 88 + treinosHeight;
+      }
+
+      return Math.max(72, 52 + treinosHeight);
+    },
+    [isCompact, isMobile, isTightCompact]
+  );
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4 }}>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
+    <Container maxWidth="lg" sx={{ mt: 4, px: { xs: 1, sm: 3 } }}>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems={isCompact ? 'flex-start' : 'center'}
+        flexDirection={isCompact ? 'column' : 'row'}
+        gap={isCompact ? 2 : 0}
+        mb={4}
+      >
         <Typography variant="h4" component="h1" sx={{ color: '#1a237e' }}>
           Usuários
         </Typography>
@@ -94,7 +323,7 @@ const UsersList = () => {
           variant="contained"
           startIcon={<AddIcon />}
           onClick={() => setOpenDialog(true)}
-          sx={{ backgroundColor: '#1a237e' }}
+          sx={{ backgroundColor: '#1a237e', alignSelf: isCompact ? 'stretch' : 'auto' }}
         >
           Adicionar Usuário
         </Button>
@@ -106,61 +335,32 @@ const UsersList = () => {
         </Alert>
       )}
 
-      <Grid container spacing={3}>
-        {users.map((user) => (
-          <Grid item xs={12} md={6} lg={4} key={user._id}>
-            <Card sx={{ height: '100%' }}>
-              <CardContent>
-                <Box display="flex" alignItems="center" mb={2}>
-                  <PersonIcon sx={{ mr: 1, color: '#1a237e' }} />
-                  <Typography variant="h6" component="h2">
-                    {user.nome}
-                  </Typography>
-                </Box>
-                <Typography color="text.secondary" gutterBottom>
-                  {user.email}
-                </Typography>
-                <Box mt={2}>
-                  <Typography variant="body2" color="text.secondary">
-                    Treinos: {user.treinos?.length || 0}
-                  </Typography>
-                  {user.treinos && user.treinos.length > 0 && (
-                    <Box mt={1}>
-                      {user.treinos.slice(0, 3).map((treino, index) => (
-                        <span key={index} style={{ display: 'inline-flex', alignItems: 'center', marginRight: 4, marginBottom: 4 }}>
-                          <Chip
-                            label={treino.nome}
-                            size="small"
-                            sx={{ mr: 0.5, mb: 0.5 }}
-                          />
-                          <IconButton size="small" onClick={() => handleEditWorkout(user._id, treino)} aria-label="Editar Treino">
-                            <EditIcon fontSize="small" />
-                          </IconButton>
-                        </span>
-                      ))}
-                      {user.treinos.length > 3 && (
-                        <Chip
-                          label={`+${user.treinos.length - 3} mais`}
-                          size="small"
-                          variant="outlined"
-                        />
-                      )}
-                    </Box>
-                  )}
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    onClick={() => handleAddWorkout(user._id)}
-                    sx={{ mt: 1 }}
-                  >
-                    Adicionar Treino
-                  </Button>
-                </Box>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
+      <Box sx={{ width: '100%', minHeight: 400 }}>
+        <DataGrid
+          rows={rows}
+          columns={columns}
+          columnVisibilityModel={columnVisibilityModel}
+          loading={loading}
+          autoHeight
+          getRowHeight={getRowHeight}
+          pageSizeOptions={[10, 25, 50]}
+          initialState={{
+            pagination: { paginationModel: { pageSize: 10 } },
+          }}
+          disableRowSelectionOnClick
+          sx={{
+            '& .MuiDataGrid-cell': {
+              alignItems: 'flex-start',
+              py: 1,
+              whiteSpace: 'normal',
+              lineHeight: 'normal',
+            },
+            '& .MuiDataGrid-columnHeader': {
+              py: 1,
+            },
+          }}
+        />
+      </Box>
 
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="sm" fullWidth>
         <DialogTitle>Adicionar Novo Usuário</DialogTitle>
@@ -225,4 +425,4 @@ const UsersList = () => {
   );
 };
 
-export default UsersList; 
+export default UsersList;
