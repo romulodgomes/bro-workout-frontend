@@ -23,7 +23,7 @@ import WorkoutForm from './WorkoutForm';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-const TreinosCell = ({ treinos, userId, isCompact, isMobile, isTightCompact, onEdit, onDelete }) => {
+const TreinosCell = ({ treinos, userId, userName, isCompact, isMobile, isTightCompact, onEdit, onDelete, onViewAll }) => {
   if (treinos.length === 0) {
     return (
       <Typography variant="body2" color="text.secondary">
@@ -94,6 +94,9 @@ const TreinosCell = ({ treinos, userId, isCompact, isMobile, isTightCompact, onE
           label={`+${treinos.length - maxVisible} mais`}
           size="small"
           variant="outlined"
+          clickable
+          onClick={() => onViewAll(userId, userName)}
+          aria-label="Ver todos os treinos"
         />
       )}
     </Box>
@@ -115,6 +118,7 @@ const UsersList = () => {
   const [editWorkoutDialog, setEditWorkoutDialog] = useState({ open: false, userId: null, treinoId: null, initialData: null });
   const [deleteWorkoutDialog, setDeleteWorkoutDialog] = useState({ open: false, userId: null, treino: null });
   const [deleting, setDeleting] = useState(false);
+  const [allWorkoutsDialog, setAllWorkoutsDialog] = useState({ open: false, userId: null, userName: '' });
 
   useEffect(() => {
     fetchUsers();
@@ -162,6 +166,16 @@ const UsersList = () => {
   const handleDeleteWorkoutClick = useCallback((userId, treino) => {
     setDeleteWorkoutDialog({ open: true, userId, treino });
   }, []);
+
+  const handleViewAllWorkouts = useCallback((userId, userName) => {
+    setAllWorkoutsDialog({ open: true, userId, userName: userName || '' });
+  }, []);
+
+  const allWorkoutsDialogTreinos = useMemo(() => {
+    if (!allWorkoutsDialog.userId) return [];
+    const user = users.find((u) => u._id === allWorkoutsDialog.userId);
+    return user?.treinos || [];
+  }, [users, allWorkoutsDialog.userId]);
 
   const handleConfirmDeleteWorkout = async () => {
     const { userId, treino } = deleteWorkoutDialog;
@@ -211,11 +225,13 @@ const UsersList = () => {
               <TreinosCell
                 treinos={params.row.treinos || []}
                 userId={params.row.id}
+                userName={params.row.nome}
                 isCompact
                 isMobile
                 isTightCompact={false}
                 onEdit={handleEditWorkout}
                 onDelete={handleDeleteWorkoutClick}
+                onViewAll={handleViewAllWorkouts}
               />
             </Box>
           ),
@@ -282,11 +298,13 @@ const UsersList = () => {
           <TreinosCell
             treinos={params.row.treinos || []}
             userId={params.row.id}
+            userName={params.row.nome}
             isCompact={isCompact}
             isMobile={false}
             isTightCompact={isTightCompact}
             onEdit={handleEditWorkout}
             onDelete={handleDeleteWorkoutClick}
+            onViewAll={handleViewAllWorkouts}
           />
         ),
       },
@@ -310,7 +328,7 @@ const UsersList = () => {
         ),
       },
     ];
-  }, [isMobile, isCompact, isTightCompact, handleEditWorkout, handleDeleteWorkoutClick]);
+  }, [isMobile, isCompact, isTightCompact, handleEditWorkout, handleDeleteWorkoutClick, handleViewAllWorkouts]);
 
   const columnVisibilityModel = useMemo(
     () => ({
@@ -463,6 +481,65 @@ const UsersList = () => {
             disabled={deleting}
           >
             {deleting ? 'Excluindo...' : 'Excluir'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={allWorkoutsDialog.open}
+        onClose={() => setAllWorkoutsDialog({ open: false, userId: null, userName: '' })}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>
+          Treinos{allWorkoutsDialog.userName ? ` — ${allWorkoutsDialog.userName}` : ''}
+        </DialogTitle>
+        <DialogContent dividers>
+          {allWorkoutsDialogTreinos.length === 0 ? (
+            <Typography variant="body2" color="text.secondary">
+              Nenhum treino
+            </Typography>
+          ) : (
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+              {allWorkoutsDialogTreinos.map((treino) => (
+                <Box
+                  key={treino._id}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: 1,
+                    py: 0.5,
+                  }}
+                >
+                  <Typography variant="body2" sx={{ minWidth: 0, wordBreak: 'break-word' }}>
+                    {treino.nome}
+                  </Typography>
+                  <Box sx={{ display: 'flex', flexShrink: 0 }}>
+                    <IconButton
+                      size="small"
+                      onClick={() => handleEditWorkout(allWorkoutsDialog.userId, treino)}
+                      aria-label="Editar Treino"
+                    >
+                      <EditIcon fontSize="small" />
+                    </IconButton>
+                    <IconButton
+                      size="small"
+                      color="error"
+                      onClick={() => handleDeleteWorkoutClick(allWorkoutsDialog.userId, treino)}
+                      aria-label="Excluir Treino"
+                    >
+                      <DeleteIcon fontSize="small" />
+                    </IconButton>
+                  </Box>
+                </Box>
+              ))}
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setAllWorkoutsDialog({ open: false, userId: null, userName: '' })}>
+            Fechar
           </Button>
         </DialogActions>
       </Dialog>
