@@ -16,6 +16,7 @@ export const usersAPI = {
   getWorkouts: (userId) => api.get(`/users/${userId}/treinos`),
   addWorkout: (userId, workoutData) => api.patch(`/users/${userId}/treinos`, workoutData),
   editWorkout: (userId, treinoId, workoutData) => api.patch(`/users/${userId}/treinos/${treinoId}`, workoutData),
+  deleteWorkout: (userId, treinoId) => api.delete(`/users/${userId}/treinos/${treinoId}`),
 };
 
 // Exercises API

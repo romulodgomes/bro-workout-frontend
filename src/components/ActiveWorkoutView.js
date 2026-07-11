@@ -85,9 +85,13 @@ const ActiveWorkoutView = () => {
   }
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+    <Container maxWidth="lg" sx={{ mt: { xs: 2, sm: 4 }, mb: 4, px: { xs: 2, sm: 3 } }}>
       <Box mb={4}>
-        <Typography variant="h4" component="h1" sx={{ color: '#1a237e', mb: 3 }}>
+        <Typography
+          variant="h4"
+          component="h1"
+          sx={{ color: 'primary.main', mb: 3, fontSize: { xs: '1.5rem', sm: '2.125rem' } }}
+        >
           Visualização de Treino Ativo
         </Typography>
         

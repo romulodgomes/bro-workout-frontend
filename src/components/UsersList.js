@@ -8,6 +8,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  DialogContentText,
   TextField,
   Alert,
   Chip,
@@ -20,8 +21,9 @@ import { usersAPI } from '../services/api';
 import AddIcon from '@mui/icons-material/Add';
 import WorkoutForm from './WorkoutForm';
 import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 
-const TreinosCell = ({ treinos, userId, isCompact, isMobile, isTightCompact, onEdit }) => {
+const TreinosCell = ({ treinos, userId, isCompact, isMobile, isTightCompact, onEdit, onDelete }) => {
   if (treinos.length === 0) {
     return (
       <Typography variant="body2" color="text.secondary">
@@ -31,7 +33,7 @@ const TreinosCell = ({ treinos, userId, isCompact, isMobile, isTightCompact, onE
   }
 
   const maxVisible = isMobile ? 2 : isTightCompact ? 1 : isCompact ? 2 : 3;
-  const chipMaxWidth = isTightCompact ? 120 : isCompact ? 140 : 180;
+  const chipMaxWidth = isTightCompact ? 100 : isCompact ? 120 : 160;
 
   return (
     <Box
@@ -76,6 +78,15 @@ const TreinosCell = ({ treinos, userId, isCompact, isMobile, isTightCompact, onE
           >
             <EditIcon fontSize="small" />
           </IconButton>
+          <IconButton
+            size="small"
+            color="error"
+            onClick={() => onDelete(userId, treino)}
+            aria-label="Excluir Treino"
+            sx={{ flexShrink: 0 }}
+          >
+            <DeleteIcon fontSize="small" />
+          </IconButton>
         </Box>
       ))}
       {treinos.length > maxVisible && (
@@ -102,6 +113,8 @@ const UsersList = () => {
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [workoutFormOpen, setWorkoutFormOpen] = useState(false);
   const [editWorkoutDialog, setEditWorkoutDialog] = useState({ open: false, userId: null, treinoId: null, initialData: null });
+  const [deleteWorkoutDialog, setDeleteWorkoutDialog] = useState({ open: false, userId: null, treino: null });
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     fetchUsers();
@@ -146,6 +159,28 @@ const UsersList = () => {
     setEditWorkoutDialog({ open: true, userId, treinoId: treino._id, initialData: treino });
   }, []);
 
+  const handleDeleteWorkoutClick = useCallback((userId, treino) => {
+    setDeleteWorkoutDialog({ open: true, userId, treino });
+  }, []);
+
+  const handleConfirmDeleteWorkout = async () => {
+    const { userId, treino } = deleteWorkoutDialog;
+    if (!userId || !treino?._id) return;
+
+    try {
+      setDeleting(true);
+      await usersAPI.deleteWorkout(userId, treino._id);
+      setDeleteWorkoutDialog({ open: false, userId: null, treino: null });
+      setError('');
+      fetchUsers();
+    } catch (err) {
+      setError('Falha ao excluir treino');
+      console.error('Error deleting workout:', err);
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   const rows = useMemo(
     () => users.map((user) => ({ ...user, id: user._id })),
     [users]
@@ -180,6 +215,7 @@ const UsersList = () => {
                 isMobile
                 isTightCompact={false}
                 onEdit={handleEditWorkout}
+                onDelete={handleDeleteWorkoutClick}
               />
             </Box>
           ),
@@ -250,32 +286,31 @@ const UsersList = () => {
             isMobile={false}
             isTightCompact={isTightCompact}
             onEdit={handleEditWorkout}
+            onDelete={handleDeleteWorkoutClick}
           />
         ),
       },
       {
         field: 'acoes',
         headerName: 'Ações',
-        width: isTightCompact ? 110 : isCompact ? 130 : 160,
+        width: 56,
         sortable: false,
         filterable: false,
+        align: 'center',
+        headerAlign: 'center',
         renderCell: (params) => (
-          <Button
-            variant="outlined"
+          <IconButton
             size="small"
+            color="primary"
             onClick={() => handleAddWorkout(params.row.id)}
-            sx={{
-              whiteSpace: 'nowrap',
-              fontSize: isCompact ? '0.75rem' : undefined,
-              px: isTightCompact ? 1 : undefined,
-            }}
+            aria-label="Adicionar Treino"
           >
-            {isCompact ? 'Adicionar' : 'Adicionar Treino'}
-          </Button>
+            <AddIcon fontSize="small" />
+          </IconButton>
         ),
       },
     ];
-  }, [isMobile, isCompact, isTightCompact, handleEditWorkout]);
+  }, [isMobile, isCompact, isTightCompact, handleEditWorkout, handleDeleteWorkoutClick]);
 
   const columnVisibilityModel = useMemo(
     () => ({
@@ -307,7 +342,7 @@ const UsersList = () => {
   );
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, px: { xs: 1, sm: 3 } }}>
+    <Container maxWidth="lg" sx={{ mt: { xs: 2, sm: 4 }, mb: 4, px: { xs: 2, sm: 3 } }}>
       <Box
         display="flex"
         justifyContent="space-between"
@@ -399,6 +434,35 @@ const UsersList = () => {
           <Button onClick={() => setOpenDialog(false)}>Cancelar</Button>
           <Button onClick={handleCreateUser} variant="contained" sx={{ backgroundColor: '#1a237e' }}>
             Criar
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={deleteWorkoutDialog.open}
+        onClose={() => !deleting && setDeleteWorkoutDialog({ open: false, userId: null, treino: null })}
+      >
+        <DialogTitle>Excluir Treino</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Tem certeza que deseja excluir o treino{' '}
+            <strong>{deleteWorkoutDialog.treino?.nome}</strong>? Esta ação não pode ser desfeita.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => setDeleteWorkoutDialog({ open: false, userId: null, treino: null })}
+            disabled={deleting}
+          >
+            Cancelar
+          </Button>
+          <Button
+            onClick={handleConfirmDeleteWorkout}
+            color="error"
+            variant="contained"
+            disabled={deleting}
+          >
+            {deleting ? 'Excluindo...' : 'Excluir'}
           </Button>
         </DialogActions>
       </Dialog>

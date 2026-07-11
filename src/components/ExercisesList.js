@@ -70,16 +70,28 @@ const ExercisesList = () => {
   }
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4 }}>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
-        <Typography variant="h4" component="h1" sx={{ color: '#1a237e' }}>
+    <Container maxWidth="lg" sx={{ mt: { xs: 2, sm: 4 }, mb: 4, px: { xs: 2, sm: 3 } }}>
+      <Box
+        display="flex"
+        flexDirection={{ xs: 'column', sm: 'row' }}
+        justifyContent="space-between"
+        alignItems={{ xs: 'stretch', sm: 'center' }}
+        gap={2}
+        mb={4}
+      >
+        <Typography
+          variant="h4"
+          component="h1"
+          sx={{ color: 'primary.main', fontSize: { xs: '1.5rem', sm: '2.125rem' } }}
+        >
           Exercícios
         </Typography>
         <Button
           variant="contained"
+          color="primary"
           startIcon={<AddIcon />}
           onClick={() => setOpenDialog(true)}
-          sx={{ backgroundColor: '#1a237e' }}
+          sx={{ alignSelf: { xs: 'stretch', sm: 'auto' } }}
         >
           Adicionar Exercício
         </Button>
@@ -97,7 +109,7 @@ const ExercisesList = () => {
             <React.Fragment key={exercise._id}>
               <ListItem alignItems="flex-start">
                 <ListItemAvatar>
-                  <Avatar sx={{ bgcolor: '#1a237e' }}>
+                  <Avatar sx={{ bgcolor: 'primary.main' }}>
                     <DirectionsRunIcon />
                   </Avatar>
                 </ListItemAvatar>
@@ -181,7 +193,7 @@ const ExercisesList = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenDialog(false)}>Cancelar</Button>
-          <Button onClick={handleCreateExercise} variant="contained" sx={{ backgroundColor: '#1a237e' }}>
+          <Button onClick={handleCreateExercise} variant="contained" color="primary">
             Criar
           </Button>
         </DialogActions>
