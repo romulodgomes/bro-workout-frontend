@@ -109,7 +109,11 @@ const ExercisesList = () => {
             <React.Fragment key={exercise._id}>
               <ListItem alignItems="flex-start">
                 <ListItemAvatar>
-                  <Avatar sx={{ bgcolor: 'primary.main' }}>
+                  <Avatar
+                    src={exercise.imagem || undefined}
+                    alt={exercise.nome}
+                    sx={{ bgcolor: 'primary.main' }}
+                  >
                     <DirectionsRunIcon />
                   </Avatar>
                 </ListItemAvatar>
